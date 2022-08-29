@@ -163,6 +163,8 @@ class AnnotationSession():
 
         group_size: number of docs per cluster
         sort_by: uncertainty_score or prediction_score
+
+        IMPORTANT FUNCTION (gets called on to get documents grouped by topics as well as the next document to highlight)
         '''
         
         columns = [
@@ -189,7 +191,7 @@ class AnnotationSession():
         # groupby = self.document_data.groupby('dominant_topic_id')
         # print(self.document_data)
         # print(self.document_data['manual_label'].isnull())
-        
+        '''
         if self.settings['use_active_learning'] and self.get_num_labelled_docs() >= ACTIVE_LEARNER_MIN_DOCS: # active learning is active
             groupby = self.document_data[self.document_data['manual_label'].isnull()].groupby('dominant_topic_id')
             print('\n --- ACTIVE LEARNING BLOCK OF GROUP BY --- \n')
@@ -197,8 +199,8 @@ class AnnotationSession():
             groupby = self.document_data[self.document_data['manual_label'].isnull()].groupby('dominant_topic_id')
             print('\n --- NOT ACTIVE LEARNING BLOCK OF GROUP BY --- \n')
             # groupby = self.document_data.groupby('topic_model_prediction')
-        
-        #groupby = self.document_data[self.document_data['manual_label'].isnull()].groupby('dominant_topic_id')
+        '''
+        groupby = self.document_data[self.document_data['manual_label'].isnull()].groupby('dominant_topic_id')
         most_uncertain_docs = []
 
         
@@ -413,8 +415,9 @@ class AnnotationSession():
         )
         self.active_learner_started = True
 
-    # label document: update, recommend next doc. if batch finished: update classifier, topic model
+    # label document: update models, update data with scores from the classifier. if batch finished: update classifier, topic model
     def label_document(self, doc_id, label, update_topic_model=True):
+        #another IMPORTANT FUNCTION
 
         self.status = 'processing...'
         self.record_action('label_document', {'doc_id': doc_id, 'label': label})
@@ -514,7 +517,8 @@ class AnnotationSession():
         # manually set uncertainty score for labelled docs
         self.document_data.loc[self.document_data['manual_label'].notnull(), 'uncertainty_score'] = 0
 
-
+    '''
+    THE BELOW FUNCTION IS NOT ACTUALLY GETTING USED RIGHT NOW (but keeping it in case the logical flow of the app code needs to be changed in order to call on a separate function to get the next document to label (right now, the app uses the second item returned by get_document_clusters() above in order to get the next document to highlight.
     # choose the next doc to annotate
     def get_next_document_to_label(self):
         return int(self.document_data['uncertainty_score'].argmax())
@@ -535,6 +539,7 @@ class AnnotationSession():
             print('\n --- COULD NOT GET NEXT DOC VIA UNCERTAINTY SCORE --- \n')
             return random.choice(list(self.document_data[self.document_data['manual_label'].isnull()].index))
         '''
+    '''
 
     '''
     def get_next_document_to_label_random(self):

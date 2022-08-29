@@ -166,8 +166,11 @@ async def label_document(doc_id: int, label: str, current_user: str = Depends(ge
     #     print('resp', resp)
     #     return resp
 
-    if label_resp == "active_learning":
+    '''
+    this below does not get used right now, since next document to label (active learner's recommendation) is obtained via get_document_clusters(); but a change in logical flow of the app could end up using the session.get_next_document_to_label() function to get the next doc to label separately.
+    if label_resp == "active_learning_update":
         resp['next_doc_id_to_label'] = session.get_next_document_to_label()
+    '''
     # # update topic model
     # print('retraining topic model...')
     # # t = threading.Thread(target=train_topic_model, args=(session))
