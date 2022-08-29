@@ -1,0 +1,21 @@
+version: '3'
+services:
+  web:
+    build: ./frontend # will build ./frontend/Dockerfile
+    ports:
+     - "3000:3000"
+    volumes:
+    - ./frontend/src:/frontend/src # for dev environment, allows hot reload
+    stdin_open: true
+  server:
+    build: ./
+    ports: # map host 80 to container port 80
+      - "81:81"
+      - "8888:8888"
+    volumes:
+      # - ./backend/data:/code/backend/data
+      # - ./backend:/code/backend
+      - .:/code
+    # command: uvicorn backend.server:app --host 0.0.0.0 --port 81 --reload
+    command: bash -c "uvicorn backend.server:app --host 0.0.0.0 --port 81 --reload && jupyter notebook --ip 0.0.0.0 --allow-root"
+
