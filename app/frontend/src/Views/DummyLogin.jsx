@@ -10,13 +10,13 @@ import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 import * as p from "../Login.css";
 
-interface Props {}
+interface Props { }
 
 interface State {
   username: string;
   password: string;
   verify_password: string;
-  username_helper: string; 
+  username_helper: string;
   password_helper: string;
   token: string;
 }
@@ -24,7 +24,7 @@ interface State {
 export default class Register extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { username: "", password: "test", verify_password:"", username_helper: "", password_helper: "", token: "" , email: ""};
+    this.state = { username: "", password: "test", verify_password: "", username_helper: "", password_helper: "", token: "", email: "" };
     this.handleUsername = this.handleUsername.bind(this);
     this.handlePassword = this.handlePassword.bind(this);
     this.handleVerifyPassword = this.handleVerifyPassword.bind(this);
@@ -43,53 +43,51 @@ export default class Register extends React.Component<Props, State> {
   handlePassword(event: React.ChangeEvent<HTMLInputElement>) {
     this.setState({ password: event.target.value });
   }
-  
+
   handleVerifyPassword(event: React.ChangeEvent<HTMLInputElement>) {
     this.setState({ verify_password: event.target.value });
   }
 
-  valid_email = (mail: string) => 
-  {
-   if (/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(mail))
-    {
+  valid_email = (mail: string) => {
+    if (/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(mail)) {
       return (true)
     }
     return (false)
   }
 
-  
+
   handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     // if(!this.valid_email(this.state.email)) {
     //   this.setState({username:"",password:"",verify_password:"",username_helper:"Not a valid email  ", password_helper:""});
     // }
-    
+
     // else if(this.state.password === this.state.verify_password) {
-      let data =
-        "username=" +
-        encodeURIComponent(this.state.username) +
-        "&password=" +
-        encodeURIComponent(this.state.password); 
-        // "&email=" +
-        // encodeURIComponent(this.state.email)
-      fetch(`/token/register_easy`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          accept: "application/json",
-        },
-        body: data,
-      })
-        .then((res) => res.json())
-        .then((result) => {
-          if ("access_token" in result) {
-            let token = result["access_token"];
-            window.sessionStorage.setItem("username", this.state.username);
-            window.sessionStorage.setItem("token", token);
-            this.setState({ username: this.state.username });
-          } else {
-            this.setState({ username: "", password: "",verify_password:"",username_helper:"Username or Email already used", password_helper: "" });
-          }
-        });
+    let data =
+      "username=" +
+      encodeURIComponent(this.state.username) +
+      "&password=" +
+      encodeURIComponent(this.state.password);
+    // "&email=" +
+    // encodeURIComponent(this.state.email)
+    fetch(process.env.REACT_APP_BACKEND_URL + `/token/register_easy`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        accept: "application/json",
+      },
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        if ("access_token" in result) {
+          let token = result["access_token"];
+          window.sessionStorage.setItem("username", this.state.username);
+          window.sessionStorage.setItem("token", token);
+          this.setState({ username: this.state.username });
+        } else {
+          this.setState({ username: "", password: "", verify_password: "", username_helper: "Username or Email already used", password_helper: "" });
+        }
+      });
     // }
     // else {
     //   this.setState({username_helper: "", password_helper:"Passwords don't match", password:"",verify_password:""});
@@ -101,7 +99,7 @@ export default class Register extends React.Component<Props, State> {
     if (window.sessionStorage.getItem("token")) {
       return <Redirect to="/home" />;
     }
-    
+
     return (
       <Container maxWidth="md">
         <CssBaseline />
@@ -166,7 +164,7 @@ export default class Register extends React.Component<Props, State> {
               value={this.state.verify_password}
               onChange={this.handleVerifyPassword}
             /> */}
-            
+
 
             <Button
               type="submit"
@@ -182,7 +180,7 @@ export default class Register extends React.Component<Props, State> {
                   {"Already have an account? Login "}
                 </a>
             </p> */}
-            
+
             {/* <Grid container className="signup">
               <Grid item xs></Grid>
               <Grid item>

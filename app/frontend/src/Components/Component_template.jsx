@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React from 'react';
 
 class Component_template extends React.Component {

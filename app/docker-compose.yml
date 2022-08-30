@@ -1,21 +1,26 @@
-version: '3'
+version: '3.8'
+
 services:
   web:
-    build: ./frontend # will build ./frontend/Dockerfile
-    ports:
-     - "3000:3000"
-    volumes:
-    - ./frontend/src:/frontend/src # for dev environment, allows hot reload
-    stdin_open: true
+    build: ./frontend/
+    container_name: ras_guidance_frontend
+    networks:
+      - homelab_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.doc_annotation_app.rule=Host(`kea-doc-annotation.${SERVER_URL}`)"
+      - "traefik.docker.network=homelab_network"
+
   server:
     build: ./
-    ports: # map host 80 to container port 80
-      - "81:81"
-      - "8888:8888"
-    volumes:
-      # - ./backend/data:/code/backend/data
-      # - ./backend:/code/backend
-      - .:/code
-    # command: uvicorn backend.server:app --host 0.0.0.0 --port 81 --reload
-    command: bash -c "uvicorn backend.server:app --host 0.0.0.0 --port 81 --reload && jupyter notebook --ip 0.0.0.0 --allow-root"
+    container_name: ras_guidance_backend
+    networks: 
+      - homelab_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.doc_annotation_backend.rule=Host(`kea-doc-annotation-backend.${SERVER_URL}`)"
+      - "traefik.docker.network=homelab_network"
 
+networks:
+  homelab_network:
+    external: true

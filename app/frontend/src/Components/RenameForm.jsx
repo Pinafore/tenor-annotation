@@ -26,57 +26,35 @@ export default function RenameForm(props) {
 
   return (
 
-    <form onSubmit={props.onSubmit} className={props.root} noValidate autoComplete="off" 
-    style={{"display": "flex", "alignItems": "center"}}>
+    <form onSubmit={props.onSubmit} className={props.root} noValidate autoComplete="off"
+      style={{ "display": "flex", "alignItems": "center" }}>
 
-        <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={label}
-            label="Label"
-            onChange={handleChange}
-            style={{width: 120, marginRight: 20}}
-        >   
-            {props.labels.map((label, index) =>
-                <MenuItem value={label} key={index}>{label}</MenuItem>
-            )}
-        </Select>
+      <Select
+        labelId="demo-simple-select-label"
+        id="demo-simple-select"
+        value={label}
+        label="Label"
+        onChange={handleChange}
+        style={{ width: 120, marginRight: 20 }}
+      >
+        {props.labels.map((label, index) =>
+          <MenuItem value={label} key={index}>{label}</MenuItem>
+        )}
+      </Select>
 
-        <TextField
-            id="outlined-name"
-            label="New label"
-            value={newLabel}
-            onChange={handleNewLabelChange}
-        />
+      <TextField
+        id="outlined-name"
+        label="New label"
+        value={newLabel}
+        onChange={handleNewLabelChange}
+      />
 
-    <div style={{padding: 20}}>
+      <div style={{ padding: 20 }}>
         <Button variant="contained" color="primary" onClick={() => props.onSubmit(label, newLabel)}>
-            Rename label
+          Rename label
         </Button>
-    </div>
-</form>
+      </div>
+    </form>
 
-
-//   <form onSubmit={props.onSubmit} noValidate autoComplete="off" 
-//   style={{"display": "flex", "alignItems": "center"}}>
-        //   <Select
-        //     labelId="demo-simple-select-label"
-        //     id="demo-simple-select"
-        //     value={label}
-        //     label="Label"
-        //     onChange={handleChange}
-        // >   
-        //     {props.labels.map((label, index) =>
-        //         <MenuItem value={label}>{label}</MenuItem>
-
-        //     )}
-        // </Select>
-  
-//   <div style={{padding: 20}}>
-//       <Button variant="contained" color="primary" onClick={props.onSubmit}>
-//           Rename label
-//       </Button>
-//   </div>
-//   </form>
   );
 }

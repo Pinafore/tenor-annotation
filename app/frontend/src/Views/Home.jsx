@@ -1,4 +1,3 @@
-/* eslint-disable */
 // Home, upload data, start session
 
 import React, { useState, useEffect } from 'react';

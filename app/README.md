@@ -14,38 +14,36 @@ Frontend is written in React, backend is written in Python (FastAPI).
 - Label predictions
 
 
-## Run
-
-`docker compose up`
+## Run locally
 
 Documentation: https://docs.google.com/document/d/17RkE-zmmuZYC3jWuBitwCuxxpng6DebMe17he2OZFds/edit#heading=h.8ioudbs2b60t
 
-To use a shell, for example to run a jupyter notebook:
-```
-docker exec -it ras-guidance-docs-server-1 bash
-jupyter notebook --ip 0.0.0.0 --allow-root
-```
-
-## Detailed Setup
 
 Need: `poetry`, `yarn`
-
-Install dependencies:  
-`poetry install`  
 
 You need two windows: one for the frontend, one for the backend+reverse proxy
 
 Window 1:
 Run backend:  
-`poetry shell` 
-`uvicorn backend.server:app --host 0.0.0.0 --port 81 --reload`
+````bash
+poetry install
+poetry shell
+python -m spacy download en_core_web_sm
+uvicorn backend.server:app --host 0.0.0.0 --port 81 --reload
+````
 
 Window 2:
-`cd frontend`
-`yarn install`
-`yarn start`
+````bash
+cd frontend
+yarn install
+yarn start
+````
+
 Access app at http://localhost:3000/  
 
+## Deploy on server
+
+To deploy on server use `docker-compose up`
 
 ## Architecture
 

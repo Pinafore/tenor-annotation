@@ -1,31 +1,13 @@
-# pull official base image
-FROM node:13.12.0-alpine
-
-# set working directory
-# WORKDIR /app
-WORKDIR /frontend
-
-# add `/app/node_modules/.bin` to $PATH
-# ENV PATH /app/node_modules/.bin:$PATH
-
-# install app dependencies
+# build environment
+FROM node:13.12.0-alpine as build
 COPY package.json ./
-# COPY package-lock.json ./
 COPY yarn.lock ./
-
-# RUN npm install --silent
-# RUN npm install react-scripts@3.4.1 -g --silent
-# RUN npm install
-# RUN npm install react-scripts@3.4.1 -g
 RUN yarn install
-# RUN yarn install react-scripts@3.4.1 -g
 RUN yarn global add react-scripts@3.4.1
+COPY . .
+RUN yarn run build
 
-# add app
-# COPY . ./
-COPY . ./
-# WORKDIR "./frontend"
-
-# start app
-# CMD ["npm", "start"]
-CMD ["yarn", "start"]
+# production environment
+FROM nginx:stable-alpine
+COPY --from=build build /usr/share/nginx/html
+CMD ["nginx", "-g", "daemon off;"]

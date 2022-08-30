@@ -521,24 +521,7 @@ class AnnotationSession():
     THE BELOW FUNCTION IS NOT ACTUALLY GETTING USED RIGHT NOW (but keeping it in case the logical flow of the app code needs to be changed in order to call on a separate function to get the next document to label (right now, the app uses the second item returned by get_document_clusters() above in order to get the next document to highlight.
     # choose the next doc to annotate
     def get_next_document_to_label(self):
-        return int(self.document_data['uncertainty_score'].argmax())
-        '''
-        print('\n --- NEXT DOC TO LABEL - ACTIVE LEARNING --- \n')
-        # uncertainty sampling
-        # query_idx, query_inst = self.learner.query(self.corpus_features)
-        # return int(query_idx[0])
-        print(self.document_data.info())
-        print(self.document_data.head())
-        try:
-            print('\n --- TRYING THROUGH UNCERTAINTY SCORE --- \n')
-            z = int(self.document_data['uncertainty_score'].argmax())
-            print(type(z))
-            print(z)
-            return z#self.document_data[['uncertainty_score']].idxmax()
-        except:
-            print('\n --- COULD NOT GET NEXT DOC VIA UNCERTAINTY SCORE --- \n')
-            return random.choice(list(self.document_data[self.document_data['manual_label'].isnull()].index))
-        '''
+        #return int(self.document_data['uncertainty_score'].argmax())
     '''
 
     '''

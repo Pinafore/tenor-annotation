@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useState, useEffect } from 'react';
 
 import Paper from '@material-ui/core/Paper';
@@ -32,7 +31,6 @@ export default withStyles(useStyles)(function Settings(props) {
     "sort_docs_by":"uncertainty",
     "sample_size": 500,
     "batch_update_freq": 3
-
 }`;
 	const [settingsText, setSettingsText] = useState("");
 	const [settings, setSettings] = useState({});

@@ -42,4 +42,5 @@ COPY ./ /code
 # RUN python -m backend.create_tables
 
 # 
-# CMD ["uvicorn", "backend.server:app", "--host", "0.0.0.0", "--port", "81", "--reload"]
+EXPOSE 81
+CMD bash -c "uvicorn backend.server:app --host 0.0.0.0 --port 81 --reload && jupyter notebook --ip 0.0.0.0 --allow-root"

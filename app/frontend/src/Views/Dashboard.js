@@ -1,8 +1,7 @@
-/* eslint-disable */
 import React, { useState } from 'react';
 import { Redirect, Link } from 'react-router-dom';
 
-import {postRequest, getRequest} from '../utils';
+import { postRequest, getRequest } from '../utils';
 
 import '../App.css';
 import { createMuiTheme, withStyles, makeStyles, ThemeProvider, styled } from '@material-ui/core/styles';
@@ -52,9 +51,9 @@ class Dashboard extends React.Component {
         this.exportData = this.exportData.bind(this);
 
         this.state = {
-            document_clusters: [],  
+            document_clusters: [],
             documents: [],
-            topics: [],   
+            topics: [],
             labels: [],
             highlightedDoc: null,
             stats: {},
@@ -67,7 +66,7 @@ class Dashboard extends React.Component {
 
     async refreshData(sort_docs = 'uncertainty') {
         console.log('refreshing data...');
-        this.setState({isLoading: true});
+        this.setState({ isLoading: true });
 
         // TODO: set interval to check on topic model
         // intervalID = setInterval(async () => {
@@ -86,14 +85,15 @@ class Dashboard extends React.Component {
         sort_docs = settings['sort_docs_by'];
         const group_size = settings['num_top_docs_shown'];
         console.log('sort_docs', sort_docs);
+        // const res = await getRequest(`/get_document_clusters?sort_by=${sort_docs}`);
         const res = await getRequest(`/get_document_clusters?group_size=${group_size}&sort_by=${sort_docs}`);
         const docToHighlight = res['doc_to_highlight'];
         console.log('docToHighlight', docToHighlight);
         const document_clusters = res['document_clusters'];
         console.log('document_clusters', document_clusters);
 
-        
-    
+
+
         const labels = await getRequest(`/get_labels`);
         // console.log('labels', labels);
 
@@ -127,9 +127,9 @@ class Dashboard extends React.Component {
         console.log('docToHighlight', docToHighlight, element);
         if (element !== null) {
             element.style.border = "thick solid red";
-            element.scrollIntoView({behavior: "smooth", block: "center"});
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
         }
-        
+
     }
 
     async exportData() {
@@ -141,20 +141,20 @@ class Dashboard extends React.Component {
                 'Authorization': `Bearer ${token}`
             },
         }).then((res) => { return res.blob(); }).then((data) => {
-          var a = document.createElement("a");
-          a.href = window.URL.createObjectURL(data);
-          a.download = "exported_annotations.jsonl";
-          a.click();
+            var a = document.createElement("a");
+            a.href = window.URL.createObjectURL(data);
+            a.download = "exported_annotations.jsonl";
+            a.click();
         });
     }
 
-    
+
     // highlight next doc to label, scroll to it
     async labelDocument(doc_id, label) {
         console.log('label doc:', doc_id, label);
         console.log('doc element', document.getElementById(doc_id));
         document.getElementById(doc_id).style.color = "green";
-        this.setState({isLoading: true});
+        this.setState({ isLoading: true });
         // force refresh page, not sure how to do this automatically
         // this.forceUpdate();
         const resp = await postRequest(`/label_document?doc_id=${doc_id}&label=${label}`);
@@ -167,39 +167,75 @@ class Dashboard extends React.Component {
         // this.forceUpdate();
 
         // scroll to next doc to label, highlight (regardless of active learning status - in no active learning case, next doc chosen randomly)
-        
-        const next_doc = this.state.docToHighlight;
-        console.log('next_doc', next_doc);
-
         if (resp['status'] === 'active_learning_update') {
-            console.log("active learning");
+            // const next_doc = resp['next_doc_id_to_label'];
+            const next_doc = this.state.docToHighlight;
+            // console.log('next_doc', next_doc)
+
+            let element = document.getElementById(next_doc);
+            // highlight text, scroll to it
+            console.log('next element', element)
+            if (element !== null) {
+                element.style.border = "thick solid red";
+                element.scrollIntoView({ behavior: "smooth", block: "center" });
+                // remove border of previous element
+                if (this.state.highlightedDoc) {
+                    this.state.highlightedDoc.style.borderColor = null;
+                }
+                this.setState({
+                    highlightedDoc: element
+                });
+            } else {
+                console.log("couldn't find document!");
+                // const first_doc = this.state.document_clusters[0]['documents'][0]['doc_id']
+                // element = document.getElementById(first_doc);
+                // console.log('next element', first_doc, element)
+                // if (element !== null) {
+                //     element.style.border = "thick solid red";
+                // element.scrollIntoView({behavior: "smooth", block: "center"});
+                // // remove border of previous element
+                // // this.state.highlightedDoc.style.borderColor = null;
+                // this.setState({
+                //     highlightedDoc: element
+                // });
+                // }
+            }
         } else {
             console.log('no active learning');
-        }
-        let element = document.getElementById(next_doc);
-        console.log('next element', element);
-        if (element !== null) {
-            /*
-            if (this.state.highlightedDoc) {
-                console.log("in the remove border if block");
-                this.state.highlightedDoc.style.borderColor = null;
-            }
-            */
-            element.style.border = "thick solid red";
-            element.scrollIntoView({behavior: "smooth", block: "center"});
-            // remove border of previous element
-            if (this.state.highlightedDoc) {
-                console.log("in the remove border if block");
-                this.state.highlightedDoc.style.borderColor = null;
-            }
-            this.setState({
-                highlightedDoc: element
-            });
-        } else {
-            console.log("couldn't find document!");
-        }
+            // const next_doc = resp['next_doc_id_to_label'];
+            const next_doc = this.state.docToHighlight;
+            // console.log('next_doc', next_doc)
 
+            let element = document.getElementById(next_doc);
+            // highlight text, scroll to it
+            console.log('next element', element)
+            if (element !== null) {
+                element.style.border = "thick solid red";
+                element.scrollIntoView({ behavior: "smooth", block: "center" });
+                // remove border of previous element
+                if (this.state.highlightedDoc) {
+                    this.state.highlightedDoc.style.borderColor = null;
+                }   
+                this.setState({
+                    highlightedDoc: element
+                });
+            } else {
+                console.log("couldn't find document!");
+                // const first_doc = this.state.document_clusters[0]['documents'][0]['doc_id']
+                // element = document.getElementById(first_doc);
+                // console.log('next element', first_doc, element)
+                // if (element !== null) {
+                //     element.style.border = "thick solid red";
+                // element.scrollIntoView({behavior: "smooth", block: "center"});
+                // // remove border of previous element
+                // // this.state.highlightedDoc.style.borderColor = null;
+                // this.setState({
+                //     highlightedDoc: element
+                // });
+                // }
+            }
 
+        }
     }
 
     async addLabel(label) {
@@ -236,19 +272,11 @@ class Dashboard extends React.Component {
 
         const { classes } = this.props;
 
-        // const topics = this.state.topics.map((words, index) =>
-        //         <ListItem key={index}>
-        //             <ListItemText primary={words.join(', ')} />
-        //         </ListItem>
-        //     );
-        
+
         const label_list = this.state.labels.map((label, index) =>
-            // <ListItem key={label}>
-            //     <ListItemText primary={label} />
-            // </ListItem>
 
             <li key={index}>
-                <LabelDetail label={label} documents={this.state.documents_grouped_by_label[label]}/>
+                <LabelDetail label={label} documents={this.state.documents_grouped_by_label[label]} />
             </li>
         );
 
@@ -258,96 +286,93 @@ class Dashboard extends React.Component {
         const num_confident_predictions = this.state.stats['num_confident_predictions'];
 
         const statistics = <ul>
-            <li>Documents labelled: {num_labelled_docs}/{num_docs}={(num_labelled_docs/num_docs).toFixed(2)}</li>
+            <li>Documents labelled: {num_labelled_docs}/{num_docs}={(num_labelled_docs / num_docs).toFixed(2)}</li>
             {/* <li>Number of predictions with score >=0.8: {num_confident_predictions}</li> */}
-            <li>Number of confident predictions: {num_confident_predictions}/{num_docs}={(num_confident_predictions/num_docs).toFixed(2)}</li>
+            <li>Number of confident predictions: {num_confident_predictions}/{num_docs}={(num_confident_predictions / num_docs).toFixed(2)}</li>
             <li>Labels: {num_labels}</li>
 
         </ul>
 
-        // loading bar
         let loadingBar;
         if (this.state.isLoading) {
             loadingBar = <div>
-                Processing... <br/>
-                <CircularProgress style={{margin: 20}}/>
+                Processing... <br />
+                <CircularProgress style={{ margin: 20 }} />
             </div>;
         }
 
-        
+
 
 
         return (
 
             <div className={classes.root}>
-    
-                <Navbar/>
-    
+
+                <Navbar />
+
                 <div className={classes.body} style={{ maxWidth: 1500, margin: "auto", paddingTop: 100 }}>
 
-                <Grid container spacing={2}>
-                    
-                    <Grid item xs={4} >
-                        <div style={{position: "sticky", top: 100}}>
+                    <Grid container spacing={2}>
 
-                    <h2>Welcome, {window.sessionStorage.getItem("username")}</h2>
+                        <Grid item xs={4} >
+                            <div style={{ position: "sticky", top: 100 }}>
 
-                    {loadingBar}
+                                <h2>Welcome, {window.sessionStorage.getItem("username")}</h2>
 
-                    <h2>Progress</h2>
-                    {statistics}
+                                {loadingBar}
 
-                    <h2>Labels</h2>
-                    <div style={{ 
-                        maxHeight: 400, 
-                        // height: 'fit-content',
-                        overflow: "scroll", 
-                        whiteSpace: "pre-wrap", 
-                        textAlign: "left", 
-                        // padding: 20
-                        
-                    }}>
-                        <ul>
-                        {label_list}
-                        </ul>
-                    </div>
+                                <h2>Progress</h2>
+                                {statistics}
 
-                        {/* buttons to add, delete, rename labels */}
-                        <TextForm text="New label" onSubmit={(label) => {this.addLabel(label)}}/>
-                        <DropdownForm text="Delete label" labels={this.state.labels} onSubmit={(label) => {this.deleteLabel(label)}}/>
-                        <RenameForm labels={this.state.labels} onSubmit={(oldLabel, newLabel) => {this.renameLabel(oldLabel, newLabel)}}/>
-                        <Button variant="contained" color="primary" onClick={this.exportData}>
-                            {/* <a href='/export_data' download>Export data</a> */}
-                            Export Data
-                        </Button>
-                        {/* <Link to="/export_data">
+                                <h2>Labels</h2>
+                                <div style={{
+                                    maxHeight: 400,
+                                    overflow: "scroll",
+                                    whiteSpace: "pre-wrap",
+                                    textAlign: "left",
+
+                                }}>
+                                    <ul>
+                                        {label_list}
+                                    </ul>
+                                </div>
+
+                                {/* buttons to add, delete, rename labels */}
+                                <TextForm text="New label" onSubmit={(label) => { this.addLabel(label) }} />
+                                <DropdownForm text="Delete label" labels={this.state.labels} onSubmit={(label) => { this.deleteLabel(label) }} />
+                                <RenameForm labels={this.state.labels} onSubmit={(oldLabel, newLabel) => { this.renameLabel(oldLabel, newLabel) }} />
+                                <Button variant="contained" color="primary" onClick={this.exportData}>
+                                    {/* <a href='/export_data' download>Export data</a> */}
+                                    Export Data
+                                </Button>
+                                {/* <Link to="/export_data">
                             <Button variant="contained" color="primary" disableElevation>
                                 Export Data
                             </Button>
                         </Link> */}
-                        
-                    </div>
-                    </Grid>
 
-                    <Grid item xs={8}>
-                        {/* <Button variant="contained" color="primary" onClick={this.exportData}>
+                            </div>
+                        </Grid>
+
+                        <Grid item xs={8}>
+                            {/* <Button variant="contained" color="primary" onClick={this.exportData}>
                             Sort documents by...
                         </Button> */}
-                        {/* <DropdownForm text="Sort documents by..." 
+                            {/* <DropdownForm text="Sort documents by..." 
                             labels={['uncertainty','confidence']} 
                             onSubmit={(label) => { 
                                 this.refreshData(label)}}/> */}
 
-                        <DocumentsByTopic 
-                            labels={this.state.labels} 
-                            labelDocument={this.labelDocument}
-                            useTopics={this.state.settings['use_topic_model']}
-                            documentClusters={this.state.document_clusters}
-                        />
+                            <DocumentsByTopic
+                                labels={this.state.labels}
+                                labelDocument={this.labelDocument}
+                                useTopics={this.state.settings['use_topic_model']}
+                                documentClusters={this.state.document_clusters}
+                            />
+                        </Grid>
                     </Grid>
-                </Grid>
 
-                
+
 
 
                 </div>

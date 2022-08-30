@@ -1382,10 +1382,10 @@ version = "0.12.2"
 description = "Tomoto, Topic Modeling Tool for Python"
 category = "main"
 optional = false
-python-versions = ">=3.7"
+python-versions = "*"
 
 [package.dependencies]
-numpy = ">=1.21.0"
+numpy = ">=1.11.0"
 
 [[package]]
 name = "tornado"
