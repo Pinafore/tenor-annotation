@@ -19,6 +19,7 @@ Frontend is written in React, backend is written in Python (FastAPI).
 Documentation: https://docs.google.com/document/d/17RkE-zmmuZYC3jWuBitwCuxxpng6DebMe17he2OZFds/edit#heading=h.8ioudbs2b60t
 
 **FIRST, download data by running `bash get_dataset.sh`**
+
 Need: `poetry`, `yarn`
 
 You need two windows: one for the frontend, one for the backend+reverse proxy
