@@ -1,4 +1,4 @@
-app/backend/data
+app/backend/data/*
 data/
 app/data
 app/frontend/node_modules
