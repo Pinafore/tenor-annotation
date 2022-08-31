@@ -1,6 +1,7 @@
-backend/data/
+app/backend/data
 data/
-frontend/node_modules
+app/data
+app/frontend/node_modules
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
