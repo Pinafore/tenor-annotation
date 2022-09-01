@@ -18,10 +18,11 @@ from modAL.models import ActiveLearner
 from modAL.uncertainty import classifier_uncertainty
 
 # from backend.topic_model import TopicModel
-from backend.topic_model_new import TopicModel
+from backend.topic_model_new import TopicModel #this can be changed to a new script with a different topic model as long as the same function names are all still present.
 
 
-
+#this, along with Settings.jsx in frontend/src/Settings.jsx is THE place to modify settings that users can change in the app, 
+#default values, new settings you want to include, etc.
 DEFAULT_SETTINGS = {
     "passage_chunk_max_words": 100,
     "use_topic_model":True,
@@ -42,11 +43,32 @@ DEFAULT_SETTINGS = {
     "sort_docs_by": "uncertainty",
     "sample_size": 500
 }
-ACTIVE_LEARNER_MIN_DOCS = 3 # min # docs to start active learner
 
+'''
+Explaining the settings above:
 
-# DATA_PATH = '/fs/clip-quiz/amao/Github/document_annotation_app/backend/data'
-DATA_PATH = 'backend/data'
+passage_chunk_max_words (int): maximum length of passage allowed after tokenization (NOTE: A better way to get reasonable passages from long docs is needed, this is a very rough first approach.
+
+use_topic_model (boolean): Whether or not to use topic model; if False, user will see just a list of all the passages...
+
+topic_model_settings (dict): The type of model (LLDA vs SLDA; SLDA was not performing well at all so for now, keep it at LLDA until new topic model is implemented), minimum number of topics, and the number of iterations when training topic model.
+
+tfidf_min (int): Minimum tfidf value to retain terms for vocab (vocab-filtering when creating representations for docs to train classifier)
+tfidf_max (int): Maximum tfidf value to retain terms for vocab (vocab-filtering when creating representations for docs to train classifier)
+
+batch_update_freq (int): retraining topic models or updating models happens after this many documents (so every X documents, where X is this value)
+
+num_top_docs_shown (int): For each group of documents grouped by topics, how many top documents (passages) for the topic to show to the user at any given time [-1 means show all documents that had that topic as their dominant topic]
+
+sort_docs_by (str): Two possible values: 'uncertainty' means use the model uncertainty in prediction to sort the documents by and pick most uncertain docs, and 'confidence' means using model confidence on the prediction (prediction_score) - right now they are practically the same with uncertainty_score = 1 - prediction_score.
+
+sample_size (int): Instead of showing and using all documents in the collections, use randomly sampled subset [-1 means use the whole collection of passages]
+
+'''
+
+ACTIVE_LEARNER_MIN_DOCS = 3 # min # docs to start active learner #hard-set global value, can be changed here. 
+
+DATA_PATH = 'backend/data' #note that by default, especially on the github repo, data directory will not include stuff, run get_dataset.sh in the main project directory inside app/ to get the data files first before anything is run locally. DO NOT ADD/COMMIT/PUSH any data files to git!
 
 class AnnotationSession():
     
@@ -146,6 +168,10 @@ class AnnotationSession():
             'predicted_label',
             'prediction_score',
             'uncertainty_score']
+        
+        ''' 
+        NOTE: The sampling is defined below, with the sample_size passed to 'limit' - however, it is possible that just sampling here is not enough? to-do: should self.document_data itself be sampled and modified?
+        '''
 
         if limit == -1:
             documents = self.document_data[columns].rename(columns={'doc_id':'id'}).fillna('')
@@ -157,6 +183,8 @@ class AnnotationSession():
 
     def get_document_clusters(self, group_size: int, sort_by: str):
         '''
+        IMPORTANT FUNCTION (gets called on to get documents grouped by topics as well as the next document to highlight)
+        
         returns dict(document_clusters, doc_to_highlight)
         document_clusters: documents clustered by their dominant topic
         doc_to_highlight: id of the document to highlight, if any
@@ -164,7 +192,7 @@ class AnnotationSession():
         group_size: number of docs per cluster
         sort_by: uncertainty_score or prediction_score
 
-        IMPORTANT FUNCTION (gets called on to get documents grouped by topics as well as the next document to highlight)
+        
         '''
         
         columns = [
@@ -201,26 +229,30 @@ class AnnotationSession():
             # groupby = self.document_data.groupby('topic_model_prediction')
         '''
         groupby = self.document_data[self.document_data['manual_label'].isnull()].groupby('dominant_topic_id')
-        most_uncertain_docs = []
+        
+        most_uncertain_docs = [] #this collects the top uncertain row of the dataframe for every group of docs, grouped by topic
 
         
         # topic_labels = self.topic_model.lda_model.topic_label_dict
         topic_labels = self.topic_model.label_set
         
         print('topic labels:', topic_labels)
-        #print('--- DOC DATA BEFORE GROUPING ---')
-        #print(self.document_data.info())
         for topic_id, group in groupby:
 
             # get the most uncertain documents
             sorted_group = group.sort_values(sort_by, ascending=False)
+            
+            '''
+            below uses num_top_docs_shown to show a specific number of top docs per topic to the user 
+            if -1, it shows all docs in the topic group (grouped by dominant_topic_id above) instead of top most uncertain ones only
+            '''
             if group_size == -1:
                 doc_ids = sorted_group['doc_id']
             else:
                 doc_ids = sorted_group['doc_id'].head(group_size)
 
-            # print(self.document_data.iloc[doc_ids].shape)
             documents = self.document_data.iloc[doc_ids][columns].fillna('')
+            
             most_uncertain_docs.append(documents.head(1))
 
             documents = documents.to_dict(orient='records')
@@ -232,12 +264,8 @@ class AnnotationSession():
             else:
                 topic_label = "None"
 
-            # print(group['manual_label'])
-            # num_labeled_docs = int((group['manual_label'] == topic_label).sum())
             num_labelled_docs = int((group['manual_label'].notnull()).sum())
             num_docs = int(group.shape[0])
-            # print('topic_label', topic_label)
-            # print(num_labeled_docs)
 
             document_clusters.append({
                 # 'topic_id': topic_id, 
@@ -249,20 +277,17 @@ class AnnotationSession():
                 # how many docs in the group have actually been labelled? 
                 })
 
-        #if self.settings['use_active_learning'] and self.get_num_labelled_docs() >= ACTIVE_LEARNER_MIN_DOCS:
-            #doc_to_highlight = int(random.choice(most_uncertain_docs)['doc_id'])
-        #else:
-            #doc_to_highlight = int(random.choice(most_uncertain_docs)['doc_id'])#random.choice(list(self.document_data[self.document_data['manual_label'].isnull()].index))
-        #print('Most uncertain docs ----')
-        #print(pd.concat(most_uncertain_docs, 0).info())
+        # pick the next document that should be highlighted per the max of chosen score - it has to be one within the collected most uncertain doc in every topic group, so those rows are concantenated and top uncertain doc_id picked.
         doc_to_highlight = int(pd.concat(most_uncertain_docs, 0).sort_values(sort_by, ascending=False).head(1)['doc_id']) #int(random.choice(most_uncertain_docs)['doc_id'])
         print(type(self.document_data['uncertainty_score']))
         print(self.document_data['uncertainty_score'].describe())
         print('Doc to highlight = ' + str(doc_to_highlight))
+        
+        #the below document clusters are used to organize the dashboard (see Dashboard.js) in frontend, and doc_to_highlight is the one that is supposed to be highlighted by the interface so user labels that.
         return {'document_clusters': document_clusters, 'doc_to_highlight': doc_to_highlight}
 
 
-    ### labels
+    ### handling labels ---
 
     def add_label(self, label):
         if label not in self.labels:
@@ -328,7 +353,7 @@ class AnnotationSession():
 
         self.record_action('rename_label', {'old_label': old_label, 'new_label': new_label})
 
-    ### topic model
+    ### topic model ---
 
     def train_topic_model(self):
 
@@ -417,7 +442,7 @@ class AnnotationSession():
 
     # label document: update models, update data with scores from the classifier. if batch finished: update classifier, topic model
     def label_document(self, doc_id, label, update_topic_model=True):
-        #another IMPORTANT FUNCTION
+        #another IMPORTANT FUNCTION!! This does get called in the all-important labelDocument function in Dashboard.js
 
         self.status = 'processing...'
         self.record_action('label_document', {'doc_id': doc_id, 'label': label})
@@ -499,10 +524,10 @@ class AnnotationSession():
     def update_classifier(self, features, label):
         self.learner.teach(features, [label]) 
 
-
     def update_document_metadata(self):
         '''
-        metadata from the classifier
+        metadata from the classifier, IMPORTANT FUNCTION, records and updates the scores with each doc that are then used to pick next
+        doc to highlight, etc. 
         '''
 
         # print('self.corpus_features', self.corpus_features)
