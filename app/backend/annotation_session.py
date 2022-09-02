@@ -21,7 +21,7 @@ from modAL.uncertainty import classifier_uncertainty
 from backend.topic_model_new import TopicModel #this can be changed to a new script with a different topic model as long as the same function names are all still present.
 
 
-#this, along with Settings.jsx in frontend/src/Settings.jsx is THE place to modify settings that users can change in the app, 
+#this, along with Settings.jsx in frontend/src/Components/Settings.jsx is THE place to modify settings that users can change in the app, 
 #default values, new settings you want to include, etc.
 DEFAULT_SETTINGS = {
     "passage_chunk_max_words": 100,
