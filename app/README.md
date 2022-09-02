@@ -1,8 +1,12 @@
 # Document Annotation App
 
+Original Author: Andrew Mao
+
+Some updated by: Pranav Goel
+
 An interface for annotating documents, with the help of topic models and active learning.
 
-Frontend is written in React, backend is written in Python (FastAPI).
+Frontend is written in React, backend is written in Python (FastAPI). **Please view the documentation in the sibling directory `docs/` in order to better understand the core functionality and state of the app (as of September 2nd, 2022).** 
 
 ![user interface](interface.png)
 
@@ -46,7 +50,17 @@ Access app at http://localhost:3000/
 
 To deploy on server use `docker-compose up`
 
-## Architecture
+## Directory structure - main files
+
+1. `backend` contains all the backend code, implementing all the computational techniques used. The major file containing the core functions is annotation_session.py, supported by all the other files. 
+
+2. `frontend` contains all the frontend code and instructions for getting familiar with React (the framework implemeting the frontend of the app).
+
+3. `Dockerfile` can be modified for adding things for deploying the app through docker-compose
+
+4. `get_dataset.sh` is the bash script that should get run first before the app is started in order to get the data used as the preloaded option for the app. 
+
+## Core Architecture pieces:
 
 ### Frontend
 - `frontend/src/`
