@@ -47,7 +47,7 @@ DEFAULT_SETTINGS = {
 '''
 Explaining the settings above:
 
-passage_chunk_max_words (int): maximum length of passage allowed after tokenization (NOTE: A better way to get reasonable passages from long docs is needed, this is a very rough first approach.
+passage_chunk_max_words (int): maximum length of passage allowed after tokenization (NOTE: A better way to get reasonable passages from long docs is needed, this is a very rough first approach.)
 
 use_topic_model (boolean): Whether or not to use topic model; if False, user will see just a list of all the passages...
 
