@@ -16,7 +16,7 @@ Frontend is written in React, backend is written in Python (FastAPI).
 
 ## Run locally
 
-Documentation: https://docs.google.com/document/d/17RkE-zmmuZYC3jWuBitwCuxxpng6DebMe17he2OZFds/edit#heading=h.8ioudbs2b60t
+Documentation: https://docs.google.com/document/d/1C53gVS8RIN50hX9Ek3GWnntPv5AFV8Gx6RWMewCJ5fM/edit?usp=sharing
 
 **FIRST, download data by running `bash get_dataset.sh`**
 
@@ -36,7 +36,7 @@ uvicorn backend.server:app --host 0.0.0.0 --port 81 --reload
 Window 2:
 ````bash
 cd frontend
-yarn install --ignore-engines
+yarn install
 yarn start
 ````
 
