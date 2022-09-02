@@ -36,7 +36,7 @@ uvicorn backend.server:app --host 0.0.0.0 --port 81 --reload
 Window 2:
 ````bash
 cd frontend
-yarn install
+yarn install --ignore-engines
 yarn start
 ````
 
