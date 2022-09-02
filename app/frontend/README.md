@@ -1,3 +1,11 @@
+# Frontend implementation
+
+`src/` contains the main implementation of all the components used in the app and what the user sees when using the app, all the views and pages, etc. - calling upon the functionality from the backend as needed to create the frontend. 
+
+The other files are relevant for getting the app up and started, more on the framework used for creating the app is detailed below. 
+
+---
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
