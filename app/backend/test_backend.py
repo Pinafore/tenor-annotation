@@ -21,7 +21,7 @@ import pandas as pd
 
 # read data
 # root_path = "/fs/clip-quiz/amao/Github/alto-boot"
-TLP_DOCUMENTS_PATH = 'backend/data/nist_ras_documents.csv'
+TLP_DOCUMENTS_PATH = 'backend/data/nist_ras_documents_cleaned.csv'
 document_data = pd.read_csv(TLP_DOCUMENTS_PATH)
 
 
